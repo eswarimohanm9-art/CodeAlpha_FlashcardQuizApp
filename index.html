@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Quiz App</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#eef2f7;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+.container{
+    background:white;
+    width:400px;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,0.1);
+}
+h1{
+    text-align:center;
+}
+.card{
+    border:2px solid #ddd;
+    border-radius:10px;
+    padding:20px;
+    text-align:center;
+    min-height:120px;
+}
+button{
+    padding:10px 15px;
+    margin:5px;
+    cursor:pointer;
+}
+input{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    box-sizing:border-box;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Flashcard Quiz App</h1>
+
+<div class="card">
+<h3 id="question"></h3>
+<p id="answer" style="display:none;"></p>
+</div>
+
+<center>
+<button onclick="showAnswer()">Show Answer</button>
+<button onclick="prevCard()">Previous</button>
+<button onclick="nextCard()">Next</button>
+</center>
+
+<hr>
+
+<h3>Manage Flashcards</h3>
+
+<input type="text" id="questionInput" placeholder="Enter Question">
+<input type="text" id="answerInput" placeholder="Enter Answer">
+
+<button onclick="addCard()">Add</button>
+<button onclick="editCard()">Edit Current</button>
+<button onclick="deleteCard()">Delete Current</button>
+
+</div>
+
+<script>
+
+let flashcards = JSON.parse(localStorage.getItem("flashcards")) || [
+{
+question:"What is HTML?",
+answer:"HTML stands for HyperText Markup Language."
+},
+{
+question:"What is CSS?",
+answer:"CSS is used for styling web pages."
+},
+{
+question:"What is JavaScript?",
+answer:"JavaScript adds interactivity to web pages."
+}
+];
+
+let currentIndex = 0;
+
+function saveCards(){
+localStorage.setItem(
+"flashcards",
+JSON.stringify(flashcards)
+);
+}
+
+function loadCard(){
+
+if(flashcards.length===0){
+document.getElementById("question").innerText="No Flashcards Available";
+document.getElementById("answer").innerText="";
+return;
+}
+
+document.getElementById("question").innerText=
+flashcards[currentIndex].question;
+
+document.getElementById("answer").innerText=
+flashcards[currentIndex].answer;
+
+document.getElementById("answer").style.display="none";
+}
+
+function showAnswer(){
+document.getElementById("answer").style.display="block";
+}
+
+function nextCard(){
+currentIndex=(currentIndex+1)%flashcards.length;
+loadCard();
+}
+
+function prevCard(){
+currentIndex=
+(currentIndex-1+flashcards.length)%flashcards.length;
+loadCard();
+}
+
+function addCard(){
+
+let q=document.getElementById("questionInput").value.trim();
+let a=document.getElementById("answerInput").value.trim();
+
+if(q==="" || a===""){
+alert("Enter Question and Answer");
+return;
+}
+
+flashcards.push({
+question:q,
+answer:a
+});
+
+saveCards();
+
+document.getElementById("questionInput").value="";
+document.getElementById("answerInput").value="";
+
+alert("Flashcard Added");
+}
+
+function editCard(){
+
+let q=document.getElementById("questionInput").value.trim();
+let a=document.getElementById("answerInput").value.trim();
+
+if(q==="" || a===""){
+alert("Enter Question and Answer");
+return;
+}
+
+flashcards[currentIndex]={
+question:q,
+answer:a
+};
+
+saveCards();
+loadCard();
+
+alert("Flashcard Updated");
+}
+
+function deleteCard(){
+
+if(flashcards.length===1){
+alert("At least one flashcard must remain");
+return;
+}
+
+flashcards.splice(currentIndex,1);
+
+currentIndex=0;
+
+saveCards();
+loadCard();
+
+alert("Flashcard Deleted");
+}
+
+loadCard();
+
+</script>
+
+</body>
+</html>
